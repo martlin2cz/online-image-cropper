@@ -196,6 +196,35 @@ oic.specToFormAndSvg = function(spec) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
+oic.toSquare = function(size) {
+	this.cropToSquare(size);
+}
+
+oic.toCircle = function(size) {
+	this.roundToCircle(size);
+}
+
+oic.cropToSquare = function(size) {
+	var less = SVG_SIZE * (size / 2);
+	var least  = SVG_SIZE * (1 - (size / 2));
+
+	var crop = { 'top': less, 'bot': least, 'left': less, 'right': least };
+	var spec = { 'crop': crop, 'round': null };
+
+	this.specToFormAndSvg(spec);
+}
+
+oic.roundToCircle = function(size) {
+	var rad = (SVG_SIZE / 2) * size;
+
+	var round = { 'round': rad };
+	var spec = { 'spec': null, 'round': round };
+	
+	this.specToFormAndSvg(spec);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
 oic.inferFromUrl = function(key) {
 	var query = location.search;
 	var tuples = query.split(/[&?]/);
@@ -225,119 +254,15 @@ oic.updateOutlink = function() {
 	outlinkInput.value = url;
 }
 
+oic.copyOutlink = function() {
+	var outlinkInput = document.getElementById('output-url');
 
-///////////////////////////////////////////////////////////////////////////////
+	outlinkInput.focus();
+	outlinkInput.setSelectionRange(0, outlinkInput.value.length);
 
-oic.toSquare = function(size) {
-	this.cropToSquare(size);
-}
-
-oic.toCircle = function(size) {
-	this.roundToCircle(size);
-}
-
-oic.cropToSquare = function(size) {
-	var less = SVG_SIZE * (size / 2);
-	var least  = SVG_SIZE * (1 - (size / 2));
-
-	var crop = { 'top': less, 'bot': least, 'left': less, 'right': least };
-	var spec = { 'crop': crop, 'round': null };
-
-	this.specToFormAndSvg(spec);
-}
-
-oic.roundToCircle = function(size) {
-	var rad = (SVG_SIZE / 2) * size;
-
-	var round = { 'round': rad };
-	var spec = { 'spec': null, 'round': round };
-	
-	this.specToFormAndSvg(spec);
-}
-///////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////
-
-
-
-
-
-
-/*
-oic.update = function() {
-	this.performCrop();
-	this.performRound();
-	this.setupImage();
-	return this.generateOutput();
-	
-}
-
-oic.setupImage = function() {
-	//var cropped = document.getElementById('image-to-crop');	
-	//cropped.setAttribute('xlink:href', imageSrc);
-}
-
-oic.generateOutput = function() {
-	//TODO
-	return "im://ag.e";
-}
-
-///////////////////////////////////////////////////////////////////////////////
-
-
-
-oic.performCrop = function() {
-	var inputCropTop = document.getElementById('input-crop-top');
-	var inputCropBottom = document.getElementById('input-crop-bottom');
-	var inputCropLeft = document.getElementById('input-crop-left');
-	var inputCropRight = document.getElementById('input-crop-right');
-	
-	var cropTop = parseInt(inputCropTop.value);
-	var cropBottom = parseInt(inputCropBottom.value);
-	var cropLeft = parseInt(inputCropLeft.value);
-	var cropRight = parseInt(inputCropRight.value);
-
-	if (cropTop >= cropBottom) {
-		console.warn("T-B: " + cropTop + " - " + cropBottom);
-		return;
+	try {
+		document.execCommand('copy');
+	} catch (e) {
+		console.error("Copy failed: " + e);
 	}
-
-	if (cropLeft >= cropRight) {
-		console.warn("L-R: " + cropLeft + " - " + cropRight);
-		return;
-	}
-
-	this.setCrop(cropTop, cropBottom, cropLeft, cropRight);
 }
-
-oic.performRound = function() {
-	var inputRoundCorners = document.getElementById('input-round-corners');
-	
-	var roundCorners = parseInt(inputRoundCorners.value) / 2;
-
-	this.setRound(roundCorners);
-}
-///////////////////////////////////////////////////////////////////////////////
-
-oic.setCrop = function(cropTop, cropBottom, cropLeft, cropRight) {
-	console.log('Cropping  t' + cropTop + ",  b" + cropBottom + ",  l" + cropLeft + ",  r" + cropRight);
-	var cropper = document.getElementById('total-crop-rect');
-
-	cropper.setAttribute('y', cropTop);
-	cropper.setAttribute('height', cropBottom - cropTop);
-	cropper.setAttribute('x', cropLeft);
-	cropper.setAttribute('width', cropRight - cropLeft);
-}
-
-oic.setRound = function(roundCorners) {
-	console.log('Rounding r' + roundCorners);
-
-	var cropper = document.getElementById('total-crop-rect');
-
-	cropper.setAttribute('rx', roundCorners);
-	cropper.setAttribute('ry', roundCorners);
-}
-	
-///////////////////////////////////////////////////////////////////////////////
-
-*/

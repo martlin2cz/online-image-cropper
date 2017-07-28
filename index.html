@@ -38,7 +38,11 @@
 			</div>
 
 			<label>Output image:</label>
-			<input type="url" name="input" id="output-url" readonly="">
+			<div class="inline-group">
+				<input type="url" name="input" id="output-url" readonly="">
+				<input type="button" onclick="oic.copyOutlink()" value="copy" class="mini-button" />
+			</div>
+
 
 			<input type="reset" value="Reset">
 		</form>
