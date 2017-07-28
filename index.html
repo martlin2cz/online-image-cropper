@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<link rel="stylesheet" type="text/css" href="css/styles.css">
+		<script type="text/javascript" src="js/scripts.js"></script>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width,initial-scale=1">
+		<title>Title</title>
+	</head>
+	<body>
+		<form onsubmit="return false;">
+			<label>Zoom:</label>
+			<input type="range" min="10" max="100" value="25" id="input-zoom" oninput="oic.changeZoom()">
+
+			<label>Input image:</label>
+			<input type="url" id="input-url" oninput="oic.loadInputImage()">
+
+			<label>Crop (top):</label>
+			<input type="range" id="input-crop-top" oninput="oic.update()" min="0" max="100" value="0">
+						
+			<label>Round corners:</label>
+			<input type="range" id="input-round-corners" oninput="oic.update()" min="0" max="100" value="0">
+	
+	
+			<label>Output image:</label>
+			<input type="url" name="input" id="input-url" readonly="">
+		</form>
+
+			<img src="img/no-image.jpg" id="input-image" alt="input-image">
+			<img src="img/no-image.jpg" id="output-image" alt="output-image">
+
+
+		<p>This is fuckin page body, man!</p>
+	</body>
+</html>
