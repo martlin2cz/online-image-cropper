@@ -5,53 +5,57 @@
 		<script type="text/javascript" src="js/scripts.js"></script>
 		<meta charset="UTF-8">
 		<meta name="viewport" content="width=device-width,initial-scale=1">
-		<title>Title</title>
+		<title>Online image cropper</title>
 	</head>
 	<body onload="oic.begin()">
-		<form onsubmit="return false;">
-			<label>Zoom:</label>
-			<input type="range" min="10" max="100" value="25" id="input-zoom" oninput="oic.changeZoom()">
 
+		<form id="main-form" onsubmit="return false;">
 			<label>Input image:</label>
 			<input type="url" id="input-url" oninput="oic.loadInputImage()">
 
 			<label>Crop (top):</label>
-			<input type="range" id="input-crop-top" oninput="oic.update()" min="0" max="100" value="0">
+			<div class="inline-group">
+				<input type="range" id="input-crop-top" oninput="oic.formToSvg()" min="0" max="100" value="0">
+				<input type="button" onclick="oic.toSquare(0)" value="full size" class="mini-button" />
+				<input type="button" onclick="oic.toSquare(1/4)" value="3/4" class="mini-button" />
+				<input type="button" onclick="oic.toSquare(1/2)" value="1/2" class="mini-button" />
+				<input type="button" onclick="oic.toSquare(3/4)" value="1/4" class="mini-button" />
+			</div>
+
 			<label>Crop (bottom):</label>
-			<input type="range" id="input-crop-bottom" oninput="oic.update()" min="0" max="100" value="100">
+			<input type="range" id="input-crop-bottom" oninput="oic.formToSvg()" min="0" max="100" value="100">
+			
 			<label>Crop (left):</label>
-			<input type="range" id="input-crop-left" oninput="oic.update()" min="0" max="100" value="0">
+			<input type="range" id="input-crop-left" oninput="oic.formToSvg()" min="0" max="100" value="0">
+			
 			<label>Crop (right):</label>
-			<input type="range" id="input-crop-right" oninput="oic.update()" min="0" max="100" value="100">
+			<input type="range" id="input-crop-right" oninput="oic.formToSvg()" min="0" max="100" value="100">
 
 			<label>Round corners:</label>
-			<input type="range" id="input-round-corners" oninput="oic.update()" min="0" max="100" value="0">
-	
-	
+			<div class="inline-group">
+				<input type="range" id="input-round-corners" oninput="oic.formToSvg()" min="0" max="50" value="0">
+				<input type="button" onclick="oic.toCircle(1)" value="circle" class="mini-button" />
+			</div>
+
 			<label>Output image:</label>
-			<input type="url" name="input" id="input-url" readonly="">
+			<input type="url" name="input" id="output-url" readonly="">
 
 			<input type="reset" value="Reset">
 		</form>
 
-			<img src="img/no-image.jpg" id="input-image" alt="input-image" onload="">
-			<img src="img/no-image.jpg" id="output-image" alt="output-image">
-
-
-			<svg width="100" height="100">
+		<div id="svg-wrapper">
+			<svg width="10" height="10" id="svg-elem">
 				<defs>
 					<clipPath id="total-crop">
 						<rect id="total-crop-rect"
-							x="0" y="0" width="100" height="100" rx="0" ry="0" />
+							x="0" y="0" width="10" height="10" rx="0" ry="0" />
 					</clipPath>
 				</defs>
-<!--
-				<rect id="background"
-						x="0" y="0" width="100" height="100" rx="0" ry="0" fill="green" />
--->				
+
 				<image id="image-to-crop"
 					xlink:href="img/no-image.jpg" clip-path="url(#total-crop)"
-					x="0" y="0" width="100" height="100" />
+					x="0" y="0" width="10" height="10" />
 			</svg>
+		</div>
 	</body>
 </html>

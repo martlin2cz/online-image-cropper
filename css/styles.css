@@ -2,9 +2,11 @@
 
 label {
 	display: block;
-	min-width: 20%;
+	min-width: 8eM;
 	float: left;
 	clear: both;
+	margin: 1% 0.2eM;
+
 }
 
 input, textarea {
@@ -15,15 +17,15 @@ input, textarea {
 /**********************************************************/
 
 input {
-	min-width: 20%;
+	min-width: 8eM;
 }
 
 input[type="submit"] {
-	min-width: 10%;
+	min-width: 5eM;
 }
 
 input[type="url"] {
-	min-width: 40%;
+	min-width: 20eM;
 }
 
 input[type="checkbox"] {
@@ -33,11 +35,16 @@ input[type="checkbox"] {
 input[type="radio"] {
 	min-width: 1eM;
 }
+
+
+input[type="range"] {
+	min-width: 10eM;
+}
 /**********************************************************/
 
 textarea {
 	font-family: inherit;
-	min-width: 40%;
+	min-width: 10eM;
 	height: 4eM;
 }
 
@@ -57,7 +64,30 @@ textarea.monospaced {
 .inline-group * {
 	display: inline;	/* hehe */
 	float: none;
+	vertical-align: top;
 }
 
+.mini-button {
+	min-width: 1eM;
+	padding: 0.4eM;
+}
+
+/**********************************************************/
+#main-form {
+	display: block;
+	float: left;
+	min-width: 30eM;
+
+	background-color: #EEEEEE;
+	margin: 1eM;
+	padding: 1eM;
+}
+
+#svg-wrapper {
+	display: inline-block;
+
+	background-color: #CCCCCC;
+	border: 1eM solid #AAAAAA;
 
 
+}
