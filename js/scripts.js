@@ -11,13 +11,26 @@ oic.begin = function() {
 	this.initializeForm();
 	this.initializeSvg();
 
-	var img = this.inferFromUrl('img');
-	//console.log("image: " + img);
+	var imgStr = this.inferFromUrl('img');
+	var specStr = this.inferFromUrl('spec');
+	var redirectStr = this.inferFromUrl('redirect');
 
-	if (img) {
+	if (imgStr) {
 		var imgInput = document.getElementById('input-url');
-		imgInput.value = img;
+		imgInput.value = imgStr;
 		this.loadInputImage();
+	}
+
+	if (specStr) {
+		var unesc = decodeURI(specStr);
+		var spec = JSON.parse(unesc);
+		this.specToFormAndSvg(spec);
+	}
+
+	if (redirectStr) {
+		var urlInput = document.getElementById('output-url');
+		var url = urlInput.value;
+		location.href = url;
 	}
 }
 
@@ -27,8 +40,6 @@ oic.initializeForm = function() {
 	var inputCropLeft = document.getElementById('input-crop-left');
 	var inputCropRight = document.getElementById('input-crop-right');
 
-	var inputRoundCorners = document.getElementById('input-round-corners');
-	
 	inputCropTop.max = SVG_SIZE;
 	inputCropBot.max = SVG_SIZE;
 	inputCropBot.value = SVG_SIZE;
@@ -36,8 +47,6 @@ oic.initializeForm = function() {
 	inputCropLeft.max = SVG_SIZE;
 	inputCropRight.max = SVG_SIZE;
 	inputCropRight.value = SVG_SIZE;
-
-	inputRoundCorners.max = SVG_SIZE / 2;
 }
 
 
@@ -83,7 +92,7 @@ oic.formToSvg = function() {
 	this.specToSvg(spec);
 }
 
-oic.spocToSvgAndForm = function(spec) {
+oic.specToSvgAndForm = function(spec) {
 	this.specToForm(spec);
 	this.specToSvg(spec);
 }
@@ -172,20 +181,40 @@ oic.specToSvg = function(spec) {
 }
 
 oic.cropToSvg = function(crop) {
+	var svg = document.getElementById('svg-elem');
+	var wrapper = document.getElementById('svg-wrapper');
 	var cropper = document.getElementById('total-crop-rect');
+	var cropped = document.getElementById('image-to-crop');
 
-	cropper.setAttribute('y', crop.top);
-	cropper.setAttribute('height', crop.bot - crop.top);
-	cropper.setAttribute('x', crop.left);
-	cropper.setAttribute('width', crop.right - crop.left);
+	wrapper.style.paddingTop = crop.top + "px";
+	wrapper.style.paddingLeft = crop.left + "px";
+	wrapper.style.paddingBottom = (SVG_SIZE - crop.bot) + "px";
+	wrapper.style.paddingRight = (SVG_SIZE - crop.right) + "px";
+	
+	var height = crop.bot - crop.top;
+	var width = crop.right - crop.left;
+
+	svg.setAttribute('height', height);
+	svg.setAttribute('width', width);
+
+	cropper.setAttribute('height', height);
+	cropper.setAttribute('width', width);
+	
+	var transformRev = "translate(" + (- crop.left) + ", " + (- crop.top) + ")"; 
+	cropped.setAttribute('transform', transformRev);
+
+	var transform = "translate(" + crop.left + ", " + crop.top + ")"; 
+	cropper.setAttribute('transform', transform);
 }
-
 
 oic.roundToSvg = function(round) {
 	var cropper = document.getElementById('total-crop-rect');
 
-	cropper.setAttribute('rx', round.round);
-	cropper.setAttribute('ry', round.round);
+	var rndX = (round.round / 100) * cropper.getAttribute('width');
+	var rndY = (round.round / 100) * cropper.getAttribute('height');
+
+	cropper.setAttribute('rx', rndX);
+	cropper.setAttribute('ry', rndY);
 }
 	
 ///////////////////////////////////////////////////////////////////////////////
