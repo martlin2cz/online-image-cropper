@@ -6,6 +6,8 @@
 var oic = {};
 
 var SVG_SIZE = 400;
+
+var DOMURL = window.URL || window.webkitURL || window;
 ///////////////////////////////////////////////////////////////////////////////
 oic.begin = function() {
 	this.initializeForm();
@@ -72,18 +74,24 @@ oic.loadInputImage = function() {
 	var url = urlInput.value;
 
 	console.info("Image loading");
-
+	var oic = this;
+	
 	var img = new Image();
 	img.onload = function() {
-		console.info("Image loaded.");
+		
+		var handler = function(data) {
+			console.info("Image loaded.");
+		
+			var toCrop = document.getElementById('image-to-crop');
+			toCrop.setAttributeNS('http://www.w3.org/1999/xlink', 'xlink:href', data);
+	
+			oic.formToSvg();
+		};
+
+		oic.imageToDataURL(url, handler);
 	};
 
 	img.src = url;
-
-	var toCrop = document.getElementById('image-to-crop');
-	toCrop.setAttribute('xlink:href', url);
-	
-	this.formToSvg();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -273,15 +281,66 @@ oic.inferFromUrl = function(key) {
 
 
 oic.updateOutlink = function() {
-	var svg = document.getElementById('svg-elem');
-	var outlinkInput = document.getElementById('output-url');
+	var handler = function(url) {			
+		var outlinkInput = document.getElementById('output-url');
+		outlinkInput.value = url;
+	}
 
+	this.generatePNGoutlink(handler);
+/*	
+	var url = this.generateSVGoutlink();
+	var outlinkInput = document.getElementById('output-url');
+	outlinkInput.value = url;
+*/
+}
+
+oic.generateSVGoutlink = function() {
+	var svg = document.getElementById('svg-elem');
 	var serializer = new XMLSerializer();                                                                                                
 	var xml = serializer.serializeToString(svg);
 		
+//	var url = "data:image/svg+xml," + encodeURIComponent(xml);
+//	var url = "data:image/svg+xml;utf8," + xml;
 	var url = "data:image/svg+xml;base64," + btoa(xml);
-	outlinkInput.value = url;
+
+	return url;
 }
+
+oic.generatePNGoutlink = function(handler) {
+	// based on https://stackoverflow.com/questions/28226677/save-inline-svg-as-jpeg-png-svg
+	var svg = document.getElementById('svg-elem');
+		
+
+	var data = (new XMLSerializer()).serializeToString(svg);
+
+  var img = new Image();
+  var svgBlob = new Blob([data], {type: 'image/svg+xml;charset=utf-8'});
+  var url = DOMURL.createObjectURL(svgBlob);
+
+	this.imageToDataURL(url, handler);
+  }
+
+oic.imageToDataURL =  function(url, handler) {
+	var img = new Image();
+	img.crossOrigin="anonymous";
+
+	var canvas = document.createElement('canvas');
+  var ctx = canvas.getContext('2d');
+  
+	img.onload = function () {
+    ctx.drawImage(img, 0, 0);
+    DOMURL.revokeObjectURL(url);
+
+    var imgURI = canvas.toDataURL('image/png');
+
+		handler(imgURI);  
+	};
+
+  img.src = url;
+
+ 
+}
+
 
 oic.copyOutlink = function() {
 	var outlinkInput = document.getElementById('output-url');
