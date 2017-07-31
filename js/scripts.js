@@ -75,12 +75,14 @@ oic.loadInputImage = function() {
 
 	console.info("Image loading");
 	var oic = this;
-	
+
 	var img = new Image();
+	img.crossOrigin="anonymous";
+	
 	img.onload = function() {
 		
 		var handler = function(data) {
-			console.info("Image loaded.");
+			console.info("Image loaded, size: " + img.width + " x " + img.height);
 		
 			var toCrop = document.getElementById('image-to-crop');
 			toCrop.setAttributeNS('http://www.w3.org/1999/xlink', 'xlink:href', data);
@@ -90,7 +92,6 @@ oic.loadInputImage = function() {
 
 		oic.imageToDataURL(url, handler);
 	};
-
 	img.src = url;
 }
 
@@ -318,7 +319,7 @@ oic.generatePNGoutlink = function(handler) {
   var url = DOMURL.createObjectURL(svgBlob);
 
 	this.imageToDataURL(url, handler);
-  }
+}
 
 oic.imageToDataURL =  function(url, handler) {
 	var img = new Image();
@@ -328,7 +329,10 @@ oic.imageToDataURL =  function(url, handler) {
   var ctx = canvas.getContext('2d');
   
 	img.onload = function () {
-    ctx.drawImage(img, 0, 0);
+		canvas.width = img.width;
+		canvas.height = img.height;
+		
+		ctx.drawImage(img, 0, 0);
     DOMURL.revokeObjectURL(url);
 
     var imgURI = canvas.toDataURL('image/png');

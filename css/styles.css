@@ -83,6 +83,10 @@ textarea.monospaced {
 	padding: 1eM;
 }
 
+#main-form p {
+	max-width: 30eM;
+}
+
 #svg-wrapper {
 	display: inline-block;
 
