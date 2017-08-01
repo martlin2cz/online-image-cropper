@@ -7,6 +7,8 @@ var oic = {};
 
 var SVG_SIZE = 400;
 
+var OUTPUT_FORMAT = 'link';	// can be 'link', 'svg' or 'png'
+
 var DOMURL = window.URL || window.webkitURL || window;
 ///////////////////////////////////////////////////////////////////////////////
 oic.begin = function() {
@@ -37,18 +39,7 @@ oic.begin = function() {
 }
 
 oic.initializeForm = function() {
-	var inputCropTop = document.getElementById('input-crop-top');
-	var inputCropBot = document.getElementById('input-crop-bottom');
-	var inputCropLeft = document.getElementById('input-crop-left');
-	var inputCropRight = document.getElementById('input-crop-right');
-
-	inputCropTop.max = SVG_SIZE;
-	inputCropBot.max = SVG_SIZE;
-	inputCropBot.value = SVG_SIZE;
-
-	inputCropLeft.max = SVG_SIZE;
-	inputCropRight.max = SVG_SIZE;
-	inputCropRight.value = SVG_SIZE;
+	//in fact nothing required here ...
 }
 
 
@@ -121,10 +112,10 @@ oic.formToCrop = function() {
 	var inputCropLeft = document.getElementById('input-crop-left');
 	var inputCropRight = document.getElementById('input-crop-right');
 	
-	var cropTop = parseInt(inputCropTop.value);
-	var cropBot = parseInt(inputCropBot.value);
-	var cropLeft = parseInt(inputCropLeft.value);
-	var cropRight = parseInt(inputCropRight.value);
+	var cropTop = parseFloat(inputCropTop.value);
+	var cropBot = parseFloat(inputCropBot.value);
+	var cropLeft = parseFloat(inputCropLeft.value);
+	var cropRight = parseFloat(inputCropRight.value);
 
 	if (cropTop >= cropBot) {
 		console.warn("T-B: " + cropTop + " - " + cropBot);
@@ -142,7 +133,7 @@ oic.formToCrop = function() {
 oic.formToRound = function() {
 	var inputRoundCorners = document.getElementById('input-round-corners');
 	
-	var roundCorners = parseInt(inputRoundCorners.value);
+	var roundCorners = parseFloat(inputRoundCorners.value);
 
 	return { 'round': roundCorners };
 }
@@ -195,13 +186,15 @@ oic.cropToSvg = function(crop) {
 	var cropper = document.getElementById('total-crop-rect');
 	var cropped = document.getElementById('image-to-crop');
 
-	wrapper.style.paddingTop = crop.top + "px";
-	wrapper.style.paddingLeft = crop.left + "px";
-	wrapper.style.paddingBottom = (SVG_SIZE - crop.bot) + "px";
-	wrapper.style.paddingRight = (SVG_SIZE - crop.right) + "px";
+	wrapper.style.paddingTop = SVG_SIZE * crop.top + "px";
+	wrapper.style.paddingLeft = SVG_SIZE * crop.left + "px";
+	wrapper.style.paddingBottom = SVG_SIZE * (1 - crop.bot) + "px";
+	wrapper.style.paddingRight = SVG_SIZE * (1 - crop.right) + "px";
 	
-	var height = crop.bot - crop.top;
-	var width = crop.right - crop.left;
+	var top = SVG_SIZE * crop.top;
+	var left = SVG_SIZE * crop.left;
+	var height = SVG_SIZE * (crop.bot - crop.top);
+	var width = SVG_SIZE * (crop.right - crop.left);
 
 	svg.setAttribute('height', height);
 	svg.setAttribute('width', width);
@@ -209,18 +202,18 @@ oic.cropToSvg = function(crop) {
 	cropper.setAttribute('height', height);
 	cropper.setAttribute('width', width);
 	
-	var transformRev = "translate(" + (- crop.left) + ", " + (- crop.top) + ")"; 
+	var transformRev = "translate(" + (- left) + ", " + (- top) + ")"; 
 	cropped.setAttribute('transform', transformRev);
 
-	var transform = "translate(" + crop.left + ", " + crop.top + ")"; 
+	var transform = "translate(" + left + ", " + top + ")"; 
 	cropper.setAttribute('transform', transform);
 }
 
 oic.roundToSvg = function(round) {
 	var cropper = document.getElementById('total-crop-rect');
 
-	var rndX = (round.round / 100) * cropper.getAttribute('width');
-	var rndY = (round.round / 100) * cropper.getAttribute('height');
+	var rndX = round.round * cropper.getAttribute('width');
+	var rndY = round.round * cropper.getAttribute('height');
 
 	cropper.setAttribute('rx', rndX);
 	cropper.setAttribute('ry', rndY);
@@ -243,8 +236,8 @@ oic.toCircle = function(size) {
 }
 
 oic.cropToSquare = function(size) {
-	var less = SVG_SIZE * (size / 2);
-	var least  = SVG_SIZE * (1 - (size / 2));
+	var less = (size / 2);
+	var least  = (1 - (size / 2));
 
 	var crop = { 'top': less, 'bot': least, 'left': less, 'right': least };
 	var spec = { 'crop': crop, 'round': null };
@@ -253,7 +246,7 @@ oic.cropToSquare = function(size) {
 }
 
 oic.roundToCircle = function(size) {
-	var rad = (SVG_SIZE / 2) * size;
+	var rad = (1 / 2) * size;
 
 	var round = { 'round': rad };
 	var spec = { 'spec': null, 'round': round };
@@ -282,17 +275,27 @@ oic.inferFromUrl = function(key) {
 
 
 oic.updateOutlink = function() {
-	var handler = function(url) {			
+	var outlinkInput = document.getElementById('output-url');
+	
+	if (OUTPUT_FORMAT == 'png') {
+		var handler = function(url) {			
+			outlinkInput.value = url;
+		}
+		this.generatePNGoutlink(handler);
+	}
+	
+	if (OUTPUT_FORMAT == 'svg') {
+		var url = this.generateSVGoutlink();
+		var outlinkInput = document.getElementById('output-url');
+		outlinkInput.value = url;
+	}
+	
+	if (OUTPUT_FORMAT == 'link') {
+		var url = this.generateLinkOutlink();
 		var outlinkInput = document.getElementById('output-url');
 		outlinkInput.value = url;
 	}
 
-	this.generatePNGoutlink(handler);
-/*	
-	var url = this.generateSVGoutlink();
-	var outlinkInput = document.getElementById('output-url');
-	outlinkInput.value = url;
-*/
 }
 
 oic.generateSVGoutlink = function() {
@@ -319,6 +322,19 @@ oic.generatePNGoutlink = function(handler) {
   var url = DOMURL.createObjectURL(svgBlob);
 
 	this.imageToDataURL(url, handler);
+}
+
+oic.generateLinkOutlink = function() {
+	var imgInput = document.getElementById('input-url');
+	var inputUrl = imgInput.value;
+	var spec = oic.formToSpec();
+	var specJson = JSON.stringify(spec);
+
+	var relativeUrl = "crop.php?img=" + inputUrl + "&spec=" + specJson;
+	var absoluteUrl = location.protocol + "" + location.hostname + "" + location.pathname + relativeUrl;
+
+	return absoluteUrl;
+
 }
 
 oic.imageToDataURL =  function(url, handler) {

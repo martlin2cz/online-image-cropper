@@ -15,7 +15,7 @@
 
 			<label>Crop (top):</label>
 			<div class="inline-group">
-				<input type="range" id="input-crop-top" oninput="oic.formToSvg()" min="0" max="100" value="0">
+				<input type="range" id="input-crop-top" oninput="oic.formToSvg()" min="0" max="1" step="0.000976563" value="0">
 				<input type="button" onclick="oic.toSquare(0)" value="full size" class="mini-button" />
 				<input type="button" onclick="oic.toSquare(1/4)" value="3/4" class="mini-button" />
 				<input type="button" onclick="oic.toSquare(1/2)" value="1/2" class="mini-button" />
@@ -23,17 +23,17 @@
 			</div>
 
 			<label>Crop (bottom):</label>
-			<input type="range" id="input-crop-bottom" oninput="oic.formToSvg()" min="0" max="100" value="100">
+			<input type="range" id="input-crop-bottom" oninput="oic.formToSvg()" min="0" max="1" step="0.000976563" value="1">
 			
 			<label>Crop (left):</label>
-			<input type="range" id="input-crop-left" oninput="oic.formToSvg()" min="0" max="100" value="0">
+			<input type="range" id="input-crop-left" oninput="oic.formToSvg()" min="0" max="1" step="0.000976563" value="0">
 			
 			<label>Crop (right):</label>
-			<input type="range" id="input-crop-right" oninput="oic.formToSvg()" min="0" max="100" value="100">
+			<input type="range" id="input-crop-right" oninput="oic.formToSvg()" min="0" max="1" step="0.000976563" value="1">
 
 			<label>Round corners:</label>
 			<div class="inline-group">
-				<input type="range" id="input-round-corners" oninput="oic.formToSvg()" min="0" max="50" value="0">
+				<input type="range" id="input-round-corners" oninput="oic.formToSvg()" min="0" max="0.5" step="0.000976563" value="0">
 				<input type="button" onclick="oic.toCircle(1)" value="circle" class="mini-button" />
 				<input type="button" onclick="oic.toCircle(0)" value="rect/square" class="mini-button" />
 			</div>
@@ -45,7 +45,7 @@
 			</div>
 
 			<input type="reset" value="Reset">
-			<p>If image won't load within approx. 10 seconds, check developper console (Google Chrome: <em>Ctrl+Shift+J</em>, Firefox: <em>Ctrl+Shift+K</em>, Opera: <em>Ctrl+Shift+I</em>). If there is error simmilar to <em>"Acces to image blocked by CORS policy"</em>, try to convert image to <em>DataURI</em> (for example, <a href="https://dopiaza.org/tools/datauri/index.php">here</a>) and use image's DataURI instead of direct image URL.</p>
+			<p><del>If image won't load within approx. 10 seconds, check developper console (Google Chrome: <em>Ctrl+Shift+J</em>, Firefox: <em>Ctrl+Shift+K</em>, Opera: <em>Ctrl+Shift+I</em>). If there is error simmilar to <em>"Acces to image blocked by CORS policy"</em>, try to convert image to <em>DataURI</em> (for example, <a href="https://dopiaza.org/tools/datauri/index.php">here</a>) and use image's DataURI instead of direct image URL.<del></p>
 		</form>
 
 		<div id="svg-wrapper">

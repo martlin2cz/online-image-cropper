@@ -1,28 +1,29 @@
 # online-image-cropper
-Simple web (html &amp; js) tool for cropping (~~and optionally other image edit operations~~) just on-line, with no images upload/download.
+`online-image-cropper` means two. Firstly, web page for interactive online cropping of images and secondly, PHP script for automated generation of cropped images.
 
-## About
+Recommended usage is to open up interactive online app (`index.html`), perform required cropping interactivelly (using sliders and life preview) and then copy generated link to `crop.php` script.
 
-Simple online editor for images performing cropping (and also rounding image corners).
+`online-image-cropper` allows to crop image and also round corners. Both sites uses encapsulation via SVG and (if needed).
 
-Firstly, insert URL of image to be cropped. By using four spinners specify top, bottom, left and right crop, and optionally specify corners' rounding radius. `oic` automatically and intteractivelly updates the preview and updates generated DataURL. This URL encapsulates the input image with the specified crops and can be simply copied and inserted where needed.
+## GET params
 
-Application runs, as expected, by running the `index.html` file.
+Both of scripts uses GET params. Following are common for both of them:
 
-## Web page api
-File `index.html` accepts optional GET parameters:
+ - `img` (url of image to be loaded)
+ - `spec` (specification of crooping, in JSON)
 
-	- `img` (url of image to be loaded)
-	- `spec` (specification of crooping, in JSON, see later)
-	- `redirect` (arbitrary value, just makes page redirect to outputed image)
+where specification of crooping in JSON looks like:
 
-Specification of crooping in JSON looks like:
+    { 'crop': { 'top': 0.1, 'bot': 0.9, 'left': 0.2, 'right': 0.8 }, 'round': { 'round': 0.33 }}
 
-    { 'crop': { 'top': 10, 'bot': 20, 'left': 30, 'right': 40 }, 'round': { 'round': 50 }}
+	When used with `index.html` presets given data form (and preview). Also can be used with `redirect=whatever` which automatically redirects to generated outlink.
+
+	Script `crop.php` can be invoked with optional param `size=<number>`, declaring size of the generated image (if no given, default, 400, is used).
 
 ## Future work
 
-	- [ ] handle errors and failures (top < bot, left > right, image not found, ...)
-	- [ ] add more edit oprations (brigthness, contrast, crop by polygon/drawing, ...)
-	- [ ] make it more interactive (drag'n'drop in preview, ...)
-	- [ ] add save/load (JSON spec)
+ - [ ] handle errors and failures (top < bot, left > right, image not found, ...)
+ - [ ] add more edit oprations (brigthness, contrast, crop by polygon/drawing, ...)
+ - [ ] make it more interactive (drag'n'drop in preview, ...)
+ - [ ] add save/load (JSON spec)
+ - [ ] avoid using DataURI or shorten it
