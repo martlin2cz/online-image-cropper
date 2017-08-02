@@ -117,16 +117,14 @@ oic.loadInputImage = function(url) {
 	
 	img.onload = function() {
 		
-		var handler = function(data) {
 			console.info("Image loaded, size: " + img.width + " x " + img.height);
 		
 			var toCrop = document.getElementById('image-to-crop');
 			toCrop.setAttributeNS('http://www.w3.org/1999/xlink', 'xlink:href', data);
 	
 			oic.formToSvg();
-		};
+			oic.updateOutlink();
 
-		oic.imageToDataURL(url, handler);
 	};
 	img.src = url;
 }
@@ -276,6 +274,7 @@ oic.cropToSquare = function(size) {
 	var spec = { 'crop': crop, 'round': null };
 
 	this.specToFormAndSvg(spec);
+	this.updateOutlink();
 }
 
 oic.roundToCircle = function(size) {
@@ -285,6 +284,7 @@ oic.roundToCircle = function(size) {
 	var spec = { 'spec': null, 'round': round };
 	
 	this.specToFormAndSvg(spec);
+	this.updateOutlink();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
