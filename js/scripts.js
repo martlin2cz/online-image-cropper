@@ -7,12 +7,63 @@ var oic = {};
 
 var SVG_SIZE = 400;
 
-var OUTPUT_FORMAT = 'link';	// can be 'link', 'svg' or 'png'
+var OUTPUT_FORMAT = 'svg';	// can be 'link', 'svg' or 'png'
 
 var DOMURL = window.URL || window.webkitURL || window;
 ///////////////////////////////////////////////////////////////////////////////
+pageLoaded = function() {
+	oic.begin();
+}
+
+loadInputImageByUrl = function() {
+	var input = document.getElementById('input-url');
+	var url = input.value;
+
+	oic.loadInputImage(url);
+}
+
+inputImagePasteHandler = function(event) {
+	var loadedUrl = null;
+
+	var handler = function(url) {
+		if (loadedUrl) {
+			return;
+		}
+		
+		loadedUrl = url;
+		oic.loadInputImage(url);
+	}
+
+	oic.pasteEventToDataURI(event, "image", handler);
+
+	oic.pasteEventToText(event, handler);
+}
+
+updateSvgByForm = function() {
+	oic.formToSvg();
+	oic.updateOutlink();
+}
+
+toSquare = function(size) {
+	oic.cropToSquare(size);
+}
+
+toCircle = function(size) {
+	oic.roundToCircle(size);
+}
+
+
+
+///////////////////////////////////////////////////////////////////////////////
+
+///////////////////////////////////////////////////////////////////////////////
+
+////////////////////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////////////////
+
+
 oic.begin = function() {
-	this.initializeForm();
 	this.initializeSvg();
 
 	var imgStr = this.inferFromUrl('img');
@@ -22,7 +73,7 @@ oic.begin = function() {
 	if (imgStr) {
 		var imgInput = document.getElementById('input-url');
 		imgInput.value = imgStr;
-		this.loadInputImage();
+		this.loadInputImage(imgStr);
 	}
 
 	if (specStr) {
@@ -32,16 +83,10 @@ oic.begin = function() {
 	}
 
 	if (redirectStr) {
-		var urlInput = document.getElementById('output-url');
-		var url = urlInput.value;
+		var url = this.generateOutlink();
 		location.href = url;
 	}
 }
-
-oic.initializeForm = function() {
-	//in fact nothing required here ...
-}
-
 
 oic.initializeSvg = function() {
 	var svg = document.getElementById('svg-elem');
@@ -60,9 +105,9 @@ oic.initializeSvg = function() {
 	img.setAttribute('height', SVG_SIZE);
 }
 	
-oic.loadInputImage = function() {
-	var urlInput = document.getElementById('input-url');
-	var url = urlInput.value;
+oic.loadInputImage = function(url) {
+	var input = document.getElementById('input-image');
+	input.value = url;
 
 	console.info("Image loading");
 	var oic = this;
@@ -96,7 +141,6 @@ oic.specToSvgAndForm = function(spec) {
 	this.specToForm(spec);
 	this.specToSvg(spec);
 }
-
 
 ///////////////////////////////////////////////////////////////////////////////
 oic.formToSpec = function() {
@@ -176,8 +220,6 @@ oic.specToSvg = function(spec) {
 	if (spec.round) {
 		this.roundToSvg(spec.round);
 	}
-
-	this.updateOutlink();
 }
 
 oic.cropToSvg = function(crop) {
@@ -226,15 +268,6 @@ oic.specToFormAndSvg = function(spec) {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-
-oic.toSquare = function(size) {
-	this.cropToSquare(size);
-}
-
-oic.toCircle = function(size) {
-	this.roundToCircle(size);
-}
-
 oic.cropToSquare = function(size) {
 	var less = (size / 2);
 	var least  = (1 - (size / 2));
@@ -256,61 +289,45 @@ oic.roundToCircle = function(size) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-oic.inferFromUrl = function(key) {
-	var query = location.search;
-	var tuples = query.split(/[&?]/);
-	//console.log(tuples);
-
-	for (var i = 0; i < tuples.length; i++) {
-		var tuple = tuples[i];
-		var parts = tuple.split('=');
-
-		if (parts[0] == key) {
-			return parts[1];
-		}
-	}
-
-	return null;
-}
-
-
 oic.updateOutlink = function() {
-	var outlinkInput = document.getElementById('output-url');
+	var outlink = document.getElementById('output-link');
 	
 	if (OUTPUT_FORMAT == 'png') {
 		var handler = function(url) {			
-			outlinkInput.value = url;
+			outlink.href = url;
 		}
-		this.generatePNGoutlink(handler);
+		this.generatePNG(inputImage, handler);
 	}
 	
 	if (OUTPUT_FORMAT == 'svg') {
-		var url = this.generateSVGoutlink();
-		var outlinkInput = document.getElementById('output-url');
-		outlinkInput.value = url;
+		var url = this.generateSVG(inputImage);
+		outlink.href = url;
 	}
 	
 	if (OUTPUT_FORMAT == 'link') {
-		var url = this.generateLinkOutlink();
-		var outlinkInput = document.getElementById('output-url');
-		outlinkInput.value = url;
+		var input = document.getElementById('input-image');
+		var inputImage = input.value;
+
+		var url = this.generateLink(inputImage);
+		outlink.href = url;
 	}
 
 }
 
-oic.generateSVGoutlink = function() {
+oic.generateSVG = function() {
 	var svg = document.getElementById('svg-elem');
+
 	var serializer = new XMLSerializer();                                                                                                
 	var xml = serializer.serializeToString(svg);
 		
-//	var url = "data:image/svg+xml," + encodeURIComponent(xml);
+	var url = "data:image/svg+xml," + encodeURIComponent(xml);
 //	var url = "data:image/svg+xml;utf8," + xml;
-	var url = "data:image/svg+xml;base64," + btoa(xml);
+//	var url = "data:image/svg+xml;base64," + btoa(xml);
 
 	return url;
 }
 
-oic.generatePNGoutlink = function(handler) {
+oic.generatePNG = function(handler) {
 	// based on https://stackoverflow.com/questions/28226677/save-inline-svg-as-jpeg-png-svg
 	var svg = document.getElementById('svg-elem');
 		
@@ -324,9 +341,8 @@ oic.generatePNGoutlink = function(handler) {
 	this.imageToDataURL(url, handler);
 }
 
-oic.generateLinkOutlink = function() {
-	var imgInput = document.getElementById('input-url');
-	var inputUrl = encodeURIComponent(imgInput.value);
+oic.generateLink = function(input) {
+	var inputUrl = encodeURIComponent(input);
 	var spec = oic.formToSpec();
 	var specJson = JSON.stringify(spec);
 
@@ -334,8 +350,10 @@ oic.generateLinkOutlink = function() {
 	var absoluteUrl = location.protocol + "//" + location.hostname + "" + location.pathname + relativeUrl;
 
 	return absoluteUrl;
-
 }
+
+///////////////////////////////////////////////////////////////////////////////
+
 
 oic.imageToDataURL =  function(url, handler) {
 	var img = new Image();
@@ -362,6 +380,8 @@ oic.imageToDataURL =  function(url, handler) {
 }
 
 
+
+/*
 oic.copyOutlink = function() {
 	var outlinkInput = document.getElementById('output-url');
 
@@ -374,31 +394,62 @@ oic.copyOutlink = function() {
 		console.error("Copy failed: " + e);
 	}
 }
+*/
 
-oic.inputImagePasteHandler = function(event) {
+oic.pasteEventToText = function(event, handler) {
+	var items = (event.clipboardData  || event.originalEvent.clipboardData).items;
+	 
+  for (var i = 0; i < items.length; i++) {
+    if (items[i].kind == 'string') {
+      var item = items[i];
+			
+			item.getAsString(handler);
+    }
+  }
+}
+
+oic.pasteEventToDataURI = function(event, typeSpec, handler) {
 	var oic = this;
 	// http://jsfiddle.net/bt7BU/225/
-
 	var items = (event.clipboardData  || event.originalEvent.clipboardData).items;
-  
+	 
   // find pasted image among pasted items
   var blob = null;
   for (var i = 0; i < items.length; i++) {
-    if (items[i].type.indexOf("image") === 0) {
+    if (items[i].type.indexOf(typeSpec) === 0) {
       blob = items[i].getAsFile();
+			break;
     }
   }
   // load image if there is a pasted image
   if (blob !== null) {
     var reader = new FileReader();
-    reader.onload = function(event) {
+    
+		reader.onload = function(event) {
 			var url = event.target.result;
       //console.log(url); // data url!
-			var imgInput = document.getElementById('input-url');
-    	imgInput.value = url;
-
-    	oic.loadInputImage();
+			handler(url);
 		};
     reader.readAsDataURL(blob);
   }
 }
+
+///////////////////////////////////////////////////////////////////////////////
+oic.inferFromUrl = function(key) {
+	var query = location.search;
+	var tuples = query.split(/[&?]/);
+	//console.log(tuples);
+
+	for (var i = 0; i < tuples.length; i++) {
+		var tuple = tuples[i];
+		var parts = tuple.split('=');
+
+		if (parts[0] == key) {
+			return parts[1];
+		}
+	}
+
+	return null;
+}
+
+
