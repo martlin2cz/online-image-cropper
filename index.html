@@ -11,7 +11,7 @@
 
 		<form id="main-form" onsubmit="return false;">
 			<label>Input image:</label>
-			<input type="url" id="input-url" oninput="oic.loadInputImage()">
+			<input type="url" id="input-url" oninput="oic.loadInputImage()" onpaste="oic.inputImagePasteHandler(event)">
 
 			<label>Crop (top):</label>
 			<div class="inline-group">

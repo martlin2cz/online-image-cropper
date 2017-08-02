@@ -72,11 +72,12 @@ header('Content-Type: image/svg+xml');
 			transform="translate(<?= $left ?>, <?= $top ?>)" />
 		</clipPath>
 	</defs>
-	
+
 	<image id="image-to-crop"
 		xmlns:xlink="http://www.w3.org/1999/xlink"
 		xlink:href="<?= $img ?>" clip-path="url(#total-crop)"
 			x="0" y="0" width="<?= $size ?>" height="<?= $size ?>" 
 			transform="translate(<?= $negLeft ?>, <?= $negTop ?>)"/>
+
 </svg>
 

@@ -326,12 +326,12 @@ oic.generatePNGoutlink = function(handler) {
 
 oic.generateLinkOutlink = function() {
 	var imgInput = document.getElementById('input-url');
-	var inputUrl = imgInput.value;
+	var inputUrl = encodeURIComponent(imgInput.value);
 	var spec = oic.formToSpec();
 	var specJson = JSON.stringify(spec);
 
 	var relativeUrl = "crop.php?img=" + inputUrl + "&spec=" + specJson;
-	var absoluteUrl = location.protocol + "" + location.hostname + "" + location.pathname + relativeUrl;
+	var absoluteUrl = location.protocol + "//" + location.hostname + "" + location.pathname + relativeUrl;
 
 	return absoluteUrl;
 
@@ -373,4 +373,32 @@ oic.copyOutlink = function() {
 	} catch (e) {
 		console.error("Copy failed: " + e);
 	}
+}
+
+oic.inputImagePasteHandler = function(event) {
+	var oic = this;
+	// http://jsfiddle.net/bt7BU/225/
+
+	var items = (event.clipboardData  || event.originalEvent.clipboardData).items;
+  
+  // find pasted image among pasted items
+  var blob = null;
+  for (var i = 0; i < items.length; i++) {
+    if (items[i].type.indexOf("image") === 0) {
+      blob = items[i].getAsFile();
+    }
+  }
+  // load image if there is a pasted image
+  if (blob !== null) {
+    var reader = new FileReader();
+    reader.onload = function(event) {
+			var url = event.target.result;
+      //console.log(url); // data url!
+			var imgInput = document.getElementById('input-url');
+    	imgInput.value = url;
+
+    	oic.loadInputImage();
+		};
+    reader.readAsDataURL(blob);
+  }
 }
