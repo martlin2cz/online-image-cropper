@@ -120,7 +120,7 @@ oic.loadInputImage = function(url) {
 			console.info("Image loaded, size: " + img.width + " x " + img.height);
 		
 			var toCrop = document.getElementById('image-to-crop');
-			toCrop.setAttributeNS('http://www.w3.org/1999/xlink', 'xlink:href', data);
+			toCrop.setAttributeNS('http://www.w3.org/1999/xlink', 'xlink:href', url);
 	
 			oic.formToSvg();
 			oic.updateOutlink();
