@@ -5,14 +5,15 @@ label {
 	min-width: 8eM;
 	float: left;
 	clear: both;
-	margin: 1% 0.2eM;
-
+	margin: 0.1eM 0.2eM;
+	padding: 0.3eM;
 }
 
-input, textarea {
+input, output, textarea {
 	display: block;
-	padding: 5px;
-	margin: 1% 0.2eM;
+	margin: 0.8eM 0.2eM;
+	padding: 0.3eM;
+
 }
 /**********************************************************/
 
