@@ -3,14 +3,10 @@
 	* m@rtlin, 28.7.2017
 	*/
 
-var oic = {};
-
-var SVG_SIZE = 400;
-
-var OUTPUT_FORMAT = 'svg';	// can be 'link', 'svg' or 'png'
 
 var DOMURL = window.URL || window.webkitURL || window;
 ///////////////////////////////////////////////////////////////////////////////
+
 pageLoaded = function() {
 	oic.begin();
 }
@@ -63,7 +59,7 @@ toCircle = function(size) {
 
 //////////////////////////////////////////////////////////////////////////////
 
-
+/*
 oic.begin = function() {
 	this.initializeSvg();
 
@@ -88,7 +84,8 @@ oic.begin = function() {
 		location.href = url;
 	}
 }
-
+*/
+/*
 oic.initializeSvg = function() {
 	var svg = document.getElementById('svg-elem');
 
@@ -105,7 +102,8 @@ oic.initializeSvg = function() {
 	img.setAttribute('width', SVG_SIZE);
 	img.setAttribute('height', SVG_SIZE);
 }
-	
+*/	
+/*
 oic.loadInputImage = function(url) {
 	var input = document.getElementById('input-image');
 	input.value = url;
@@ -129,7 +127,8 @@ oic.loadInputImage = function(url) {
 	};
 	img.src = url;
 }
-
+*/
+/*
 ///////////////////////////////////////////////////////////////////////////////
 oic.formToSvg = function() {
 	var spec = this.formToSpec();
@@ -140,7 +139,8 @@ oic.specToSvgAndForm = function(spec) {
 	this.specToForm(spec);
 	this.specToSvg(spec);
 }
-
+*/
+/*
 ///////////////////////////////////////////////////////////////////////////////
 oic.formToSpec = function() {
 	var crop = this.formToCrop();
@@ -180,7 +180,8 @@ oic.formToRound = function() {
 
 	return { 'round': roundCorners };
 }
-
+*/
+/*
 ///////////////////////////////////////////////////////////////////////////////
 oic.specToForm = function(spec) {
 	if (spec.crop) {
@@ -209,7 +210,8 @@ oic.roundToForm = function(round) {
 	
 	inputRoundCorners.value = round.round;
 }
-
+*/
+/*
 ///////////////////////////////////////////////////////////////////////////////
 oic.specToSvg = function(spec) {
 	if (spec.crop) {
@@ -259,7 +261,8 @@ oic.roundToSvg = function(round) {
 	cropper.setAttribute('rx', rndX);
 	cropper.setAttribute('ry', rndY);
 }
-	
+*/	
+/*
 ///////////////////////////////////////////////////////////////////////////////
 oic.specToFormAndSvg = function(spec) {
 	this.specToForm(spec);
@@ -314,8 +317,10 @@ oic.updateOutlink = function() {
 	}
 
 }
-
+*/
+/*
 oic.generateSVG = function() {
+	
 	var svg = document.getElementById('svg-elem');
 
 	var serializer = new XMLSerializer();                                                                                                
@@ -363,10 +368,10 @@ oic.generateLink = function(input) {
 
 	return absoluteUrl;
 }
-
+*/
 ///////////////////////////////////////////////////////////////////////////////
 
-
+/*
 oic.imageToDataURL =  function(url, handler) {
 	var img = new Image();
 	img.crossOrigin="anonymous";
@@ -391,7 +396,7 @@ oic.imageToDataURL =  function(url, handler) {
  
 }
 
-
+*/
 
 /*
 oic.copyOutlink = function() {

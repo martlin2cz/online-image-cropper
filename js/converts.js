@@ -2,6 +2,10 @@
 	* Conversions images <-> DataURI
 	*/
 
+
+var DOMURL = window.URL || window.webkitURL || window;
+///////////////////////////////////////////////////////////////////////////////
+
 oic.convertImageURLtoImageData = function(inputUrl, imageType, handler) {
   var img = new Image();                                                                                                               
   img.crossOrigin="anonymous";
@@ -12,12 +16,11 @@ oic.convertImageURLtoImageData = function(inputUrl, imageType, handler) {
 	img.onload = function () {
     canvas.width = img.width;
     canvas.height = img.height;
-
-    ctx.drawImage(img, 0, 0);
+    
+		ctx.drawImage(img, 0, 0);
     DOMURL.revokeObjectURL(inputUrl);
 
     var imgDataURL = canvas.toDataURL('image/' + imageType);
-
     handler(imgDataURL);
   };
 
