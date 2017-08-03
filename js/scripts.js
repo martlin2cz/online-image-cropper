@@ -23,21 +23,22 @@ loadInputImageByUrl = function() {
 }
 
 inputImagePasteHandler = function(event) {
-	var loadedUrl = null;
 
-	var handler = function(url) {
-		if (loadedUrl) {
-			return;
+	var pasteHandler = function(url) {
+		var textHandler = function(url) {
+			oic.loadInputImage(url);
 		}
-		
-		loadedUrl = url;
-		oic.loadInputImage(url);
+
+		if (url) {
+			oic.loadInputImage(url);			
+		} else {
+			oic.pasteEventToText(event, textHandler);
+		}
 	}
 
-	oic.pasteEventToDataURI(event, "image", handler);
+	oic.pasteEventToDataURI(event, "image", pasteHandler);
 
-	oic.pasteEventToText(event, handler);
-}
+	}
 
 updateSvgByForm = function() {
 	oic.formToSvg();
@@ -296,7 +297,7 @@ oic.updateOutlink = function() {
 		var handler = function(url) {			
 			outlink.href = url;
 		}
-		this.generatePNG(inputImage, handler);
+		this.generatePNG(handler);
 	}
 	
 	if (OUTPUT_FORMAT == 'svg') {
@@ -330,7 +331,16 @@ oic.generateSVG = function() {
 oic.generatePNG = function(handler) {
 	// based on https://stackoverflow.com/questions/28226677/save-inline-svg-as-jpeg-png-svg
 	var svg = document.getElementById('svg-elem');
-		
+	
+	var imgElem = document.getElementById('image-to-crop');
+	
+	var toCrop = document.getElementById('image-to-crop');
+	var dataurlize = function(DataUrl) {
+	 toCrop.setAttributeNS('http://www.w3.org/1999/xlink', 'xlink:href', DataUrl);
+	
+	
+
+//	imgElem.setAttributeNS(''
 
 	var data = (new XMLSerializer()).serializeToString(svg);
 
@@ -339,6 +349,8 @@ oic.generatePNG = function(handler) {
   var url = DOMURL.createObjectURL(svgBlob);
 
 	this.imageToDataURL(url, handler);
+	}
+
 }
 
 oic.generateLink = function(input) {
@@ -361,7 +373,7 @@ oic.imageToDataURL =  function(url, handler) {
 
 	var canvas = document.createElement('canvas');
   var ctx = canvas.getContext('2d');
-  
+ document.body.appendChild(canvas); 
 	img.onload = function () {
 		canvas.width = img.width;
 		canvas.height = img.height;
@@ -397,6 +409,7 @@ oic.copyOutlink = function() {
 */
 
 oic.pasteEventToText = function(event, handler) {
+/*
 	var items = (event.clipboardData  || event.originalEvent.clipboardData).items;
 	 
   for (var i = 0; i < items.length; i++) {
@@ -406,6 +419,8 @@ oic.pasteEventToText = function(event, handler) {
 			item.getAsString(handler);
     }
   }
+	*/
+	handler(null);
 }
 
 oic.pasteEventToDataURI = function(event, typeSpec, handler) {
@@ -416,8 +431,10 @@ oic.pasteEventToDataURI = function(event, typeSpec, handler) {
   // find pasted image among pasted items
   var blob = null;
   for (var i = 0; i < items.length; i++) {
-    if (items[i].type.indexOf(typeSpec) === 0) {
-      blob = items[i].getAsFile();
+ console.log(items[i]);
+		if (items[i].type.indexOf(typeSpec) === 0) {
+ 
+			blob = items[i].getAsFile();
 			break;
     }
   }

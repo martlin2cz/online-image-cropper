@@ -1,0 +1,178 @@
+/**
+	* Conversions images <-> DataURI
+	*/
+
+oic.convertImageURLtoImageData = function(inputUrl, imageType, handler) {
+  var img = new Image();                                                                                                               
+  img.crossOrigin="anonymous";
+
+  var canvas = document.createElement('canvas');
+  var ctx = canvas.getContext('2d');
+  
+	img.onload = function () {
+    canvas.width = img.width;
+    canvas.height = img.height;
+
+    ctx.drawImage(img, 0, 0);
+    DOMURL.revokeObjectURL(inputUrl);
+
+    var imgDataURL = canvas.toDataURL('image/' + imageType);
+
+    handler(imgDataURL);
+  };
+
+  img.src = inputUrl;
+}
+
+oic.convertSVGtoSVGdata = function(svg, encoding) {
+  var serializer = new XMLSerializer();                                                                                                
+  var xml = serializer.serializeToString(svg);
+    
+	switch (encoding) {
+		case 'utf-8':
+		case 'utf8':
+		 return "data:image/svg+xml;utf8," + xml;
+
+		case 'base64':
+		case 'Base64':
+			return "data:image/svg+xml;base64," + btoa(xml);
+
+		case 'uri':
+		default:
+			return "data:image/svg+xml," + encodeURIComponent(xml);
+	}
+} 
+
+oic.convertSVGtoImageData = function(svg, imageType, handler) {
+	var oic = this;
+	var copy = svg.cloneNode(true);
+	this.imagesInSvgToData(copy, imageType, function(svg) {
+
+		var url = oic.convertSVGtoSVGdata(svg, null);
+		oic.convertImageURLtoImageData(url, imageType, handler);
+	});
+}
+
+////////////////////////////////////////////////////////////////////////////////////
+
+oic.imagesInSvgToData = function(svg, imageType, modifiedSvgHandler) {
+	var oic = this;
+	this.treeProcess(svg, function(e) {
+		return e.childNodes;
+	}, function(e, itemStartedHandler, itemCompletedHandler) {
+	 if (e.nodeName == 'image') {
+			itemStartedHandler();
+      var originalUrl = e.getAttributeNS('http://www.w3.org/1999/xlink', 'href');
+      
+      oic.convertImageURLtoImageData(originalUrl, imageType, function(url) {
+        e.setAttributeNS('http://www.w3.org/1999/xlink', 'href', url);
+       	itemCompletedHandler();
+      });
+		}
+	}, function() {
+		modifiedSvgHandler(svg);
+	});
+}
+
+////////////////////////////////////////////////////////////////////////////////////
+
+
+oic.treeProcess = function(input, childGenerator, itemProcessor, resultProcessor) {
+	var children = childGenerator(input);
+	var remaining = 0;
+	
+	var itemStartedHandler = function() {
+		remaining++;
+	}
+
+	var itemCompletedHandler = function() {
+		remaining--;
+		if (remaining <= 0) {
+			resultProcessor();
+		}		
+	}
+
+	for (var i = 0; i < children.length; i++) {
+		var child = children[i];
+		
+		itemProcessor(child, itemStartedHandler, itemCompletedHandler);
+		
+		this.treeProcess(child, childGenerator, itemProcessor, resultProcessor);
+	}
+}
+
+
+////////////////////////////////////////////////////////////////////////////////////
+oic.convertPasteEventToURL = function(event, ifImageType, handler) {
+	var oic = this;
+	var type = oic.determinePasteType(event);
+	
+	switch (type) {
+		case 'string':
+			oic.inferTextFromPaste(event, function(url) {
+				if (ifImageType) {
+					oic.convertImageURLtoImageData(url, ifImageType, handler);				
+				} else {
+					handler(url);
+				}
+			});
+			break;
+
+		case 'file':
+			this.inferDataFromPaste(event, handler);
+			break;
+		default:
+			console.warn("Unknown paste type");
+	}
+}
+
+
+oic.determinePasteType = function(event) {
+	var data = event.clipboardData  || event.originalEvent.clipboardData;
+	var items = data.items;
+
+	switch (items.length) {
+		case 0:
+			return null;
+		case 1:
+			if (items[0].kind == 'string') {
+				return 'string';
+			} else {
+				return null;
+			}
+		case 2:
+			if (items[1].kind == 'file') {
+				return 'file';
+			} else {
+				return null;
+			}
+		default:
+			return null;
+	}
+}
+
+oic.inferTextFromPaste = function(event, handler) {
+	var data = event.clipboardData  || event.originalEvent.clipboardData;
+	var items = data.items;
+	var item = items[0];
+
+	item.getAsString(handler);
+}
+
+
+oic.inferDataFromPaste = function(event, handler) {
+	var data = event.clipboardData  || event.originalEvent.clipboardData;
+	var items = data.items;
+	
+	var item = items[1];
+  var blob = item.getAsFile();
+
+	var reader = new FileReader();
+    
+	reader.onload = function(event) {
+		var url = event.target.result;
+		handler(url);
+	};
+
+	reader.readAsDataURL(blob);
+}
