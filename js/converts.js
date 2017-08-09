@@ -25,7 +25,7 @@ oic.convertImageURLtoImageData = function(inputUrl, imageType, handler) {
     handler(imgDataURL);
   };
 	img.onerror = function(e) {
-		alert("Error: " + e);
+		alert("Error: Cannot export image, nested image does not exist or is protected against copying. Try copy image data instead.");
 	}
 
   img.src = inputUrl;
