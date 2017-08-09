@@ -54,6 +54,11 @@ oic.loadInputImage = function(url) {
       oic.updateOutlink();
 
   };
+	img.onerror = function(e) {
+		console.error("Image could not be loaded.");
+		alert("Image loading failed. Image does not exist or is protected against copying. " 
+				+ "If you have pasted URL of image, try direct copy of image instead.");
+	}
   img.src = url;
 }
 

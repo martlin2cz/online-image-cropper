@@ -1,4 +1,5 @@
 /**
+	* 
 	* Conversions images <-> DataURI
 	*/
 
@@ -23,6 +24,9 @@ oic.convertImageURLtoImageData = function(inputUrl, imageType, handler) {
     var imgDataURL = canvas.toDataURL('image/' + imageType);
     handler(imgDataURL);
   };
+	img.onerror = function(e) {
+		alert("Error: " + e);
+	}
 
   img.src = inputUrl;
 }
@@ -176,6 +180,9 @@ oic.inferDataFromPaste = function(event, handler) {
 		var url = event.target.result;
 		handler(url);
 	};
+	reader.onerror = function(e) {
+		alert(error);
+	}
 
 	reader.readAsDataURL(blob);
 }

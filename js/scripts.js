@@ -436,7 +436,6 @@ oic.pasteEventToDataURI = function(event, typeSpec, handler) {
   // find pasted image among pasted items
   var blob = null;
   for (var i = 0; i < items.length; i++) {
- console.log(items[i]);
 		if (items[i].type.indexOf(typeSpec) === 0) {
  
 			blob = items[i].getAsFile();
