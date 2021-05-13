@@ -15,15 +15,16 @@ oic.convertImageURLtoImageData = function(inputUrl, imageType, handler) {
   var ctx = canvas.getContext('2d');
   
 	img.onload = function () {
-    canvas.width = img.width;
-    canvas.height = img.height;
-    
+		canvas.width = img.width;
+		canvas.height = img.height;
+		
 		ctx.drawImage(img, 0, 0);
-    DOMURL.revokeObjectURL(inputUrl);
+		DOMURL.revokeObjectURL(inputUrl);
 
-    var imgDataURL = canvas.toDataURL('image/' + imageType);
-    handler(imgDataURL);
-  };
+		var imgDataURL = canvas.toDataURL('image/' + imageType);
+		handler(imgDataURL);
+	  };
+	  
 	img.onerror = function(e) {
 		alert("Error: Cannot export image, nested image does not exist or is protected against copying. Try copy image data instead.");
 	}
@@ -65,20 +66,23 @@ oic.convertSVGtoImageData = function(svg, imageType, handler) {
 oic.imagesInSvgToData = function(svg, imageType, modifiedSvgHandler) {
 	var oic = this;
 	this.treeProcess(svg, function(e) {
-		return e.childNodes;
-	}, function(e, itemStartedHandler, itemCompletedHandler) {
-	 if (e.nodeName == 'image') {
-			itemStartedHandler();
-      var originalUrl = e.getAttributeNS('http://www.w3.org/1999/xlink', 'href');
-      
-      oic.convertImageURLtoImageData(originalUrl, imageType, function(url) {
-        e.setAttributeNS('http://www.w3.org/1999/xlink', 'href', url);
-       	itemCompletedHandler();
-      });
+			return e.childNodes;
+		}, 
+		function(e, itemStartedHandler, itemCompletedHandler) {
+			if (e.nodeName == 'image') {
+				itemStartedHandler();
+				var originalUrl = e.getAttributeNS('http://www.w3.org/1999/xlink', 'href');
+			  
+				oic.convertImageURLtoImageData(originalUrl, imageType, function(url) {
+					e.setAttributeNS('http://www.w3.org/1999/xlink', 'href', url);
+					itemCompletedHandler();
+				});
+			}
+		},
+		function() {
+			modifiedSvgHandler(svg);
 		}
-	}, function() {
-		modifiedSvgHandler(svg);
-	});
+	);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////
@@ -172,7 +176,7 @@ oic.inferDataFromPaste = function(event, handler) {
 	var items = data.items;
 	
 	var item = items[1];
-  var blob = item.getAsFile();
+	var blob = item.getAsFile();
 
 	var reader = new FileReader();
     
@@ -180,6 +184,7 @@ oic.inferDataFromPaste = function(event, handler) {
 		var url = event.target.result;
 		handler(url);
 	};
+	
 	reader.onerror = function(e) {
 		alert(error);
 	}
