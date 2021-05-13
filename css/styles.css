@@ -96,3 +96,16 @@ textarea.monospaced {
 
 
 }
+
+
+/**********************************************************/
+
+#error-panel {
+	color: #800000;
+	background-color: #FFCCCC;
+	padding: 0.5eM 1eM;
+}
+
+.hidden {
+	display: none
+}

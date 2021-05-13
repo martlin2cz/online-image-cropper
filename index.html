@@ -11,13 +11,19 @@
 		
 		<meta charset="UTF-8">
 		<meta name="viewport" content="width=device-width,initial-scale=1">
-		<title>Online image cropper</title>
+		<title>Online image cropper 1.1</title>
 	</head>
 	<body onload="pageLoaded()">
 
 		<form id="main-form" onsubmit="return false;">
 			<input type="hidden" id="input-image">
-
+			
+			<section id="error-panel" class="hidden">
+				<h2>ERROR</h2>
+				<p id="error-text">There happened some error.</p>
+				<button onclick="this.parentNode.classList.add('hidden');">Hide</button>
+			</section>
+			
 			<label>Input image:</label>
 			<input type="url" id="input-url" oninput="loadInputImageByUrl()"  onpaste="inputImagePasteHandler(event)">
 

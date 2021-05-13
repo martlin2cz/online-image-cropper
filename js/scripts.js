@@ -49,8 +49,12 @@ toCircle = function(size) {
 	oic.roundToCircle(size, handleError);
 }
 
-handleError = function(e) {
-	alert("ERROR:" + e);
+handleError = function(msg, e) {
+	var errorPanel = document.getElementById('error-panel');
+	errorPanel.classList.remove('hidden');
+	
+	var errorText = document.getElementById('error-text');
+	errorText.innerText = msg;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
