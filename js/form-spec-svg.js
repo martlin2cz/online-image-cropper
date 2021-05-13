@@ -158,7 +158,7 @@ oic.specToFormAndSvg = function(spec) {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-oic.cropToSquare = function(size) {
+oic.cropToSquare = function(size, errorHandler) {
   var less = (size / 2);
   var least  = (1 - (size / 2));
 
@@ -166,17 +166,17 @@ oic.cropToSquare = function(size) {
   var spec = { 'crop': crop, 'round': null };
 
   this.specToFormAndSvg(spec);
-  this.updateOutlink();
+  this.updateOutlink(errorHandler);
 }
 
-oic.roundToCircle = function(size) {
+oic.roundToCircle = function(size, errorHandler) {
   var rad = (1 / 2) * size;
 
   var round = { 'round': rad };
   var spec = { 'spec': null, 'round': round };
 
   this.specToFormAndSvg(spec);
-  this.updateOutlink();
+  this.updateOutlink(errorHandler);
 }
 
 ///////////////////////////////////////////////////////////////////////////////

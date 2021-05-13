@@ -18,7 +18,7 @@ oic.begin = function() {
   if (imgStr) {
     var imgInput = document.getElementById('input-url');
     imgInput.value = imgStr;
-    this.loadInputImage(imgStr);
+    this.loadInputImage(imgStr, errorHandler);
   }
 
   if (specStr) {
@@ -33,7 +33,7 @@ oic.begin = function() {
   }
 }
 
-oic.loadInputImage = function(url) {
+oic.loadInputImage = function(url, errorHandler) {
   var input = document.getElementById('input-image');
   input.value = url;
 
@@ -51,14 +51,14 @@ oic.loadInputImage = function(url) {
       toCrop.setAttributeNS('http://www.w3.org/1999/xlink', 'xlink:href', url);
   
       oic.formToSvg();
-      oic.updateOutlink();
+      oic.updateOutlink(errorHandler);
 
   };
 
   img.onerror = function(e) {
 	console.error("Image could not be loaded.");
-	alert("Image loading failed. Image does not exist or is protected against copying. " 
-			+ "If you have pasted URL of image, try direct copy of image instead.");
+	errorHandler("Image loading failed. Image does not exist or is protected against copying. " 
+			+ "If you have pasted URL of image, try direct copy of image instead.", e);
   }
 
   img.src = url;
@@ -67,7 +67,7 @@ oic.loadInputImage = function(url) {
 
 //////////////////////////////////////////////////////////////////////////////
 
-oic.updateOutlink = function() {
+oic.updateOutlink = function(errorHandler) {
   var svg = document.getElementById('svg-elem');
 	var outlink = document.getElementById('output-link');
 
@@ -80,11 +80,11 @@ oic.updateOutlink = function() {
 
 	switch (OUTPUT_FORMAT) {
 		case 'svg':
-			this.generateSVG(svg, handler);
+			this.generateSVG(svg, handler, errorHandler);
 			break;
 		case 'png':
 		case 'jpeg':
-			this.generateBitmap(svg, OUTPUT_FORMAT, handler);
+			this.generateBitmap(svg, OUTPUT_FORMAT, handler, errorHandler);
 			break;
 		case 'link':
 			this.generateLink(inputUrl, handler);
@@ -117,15 +117,15 @@ oic.updateOutlink = function() {
 }
 
 
-oic.generateSVG = function(svg, outlink, handler) {
+oic.generateSVG = function(svg, outlink, handler, errorHandler) {
 	
-	var url = this.convertSVGtoSVGdata(svg, SVG_ENCODING);
+	var url = this.convertSVGtoSVGdata(svg, SVG_ENCODING, errorHandler);
 
 	handler(url);
 }
 
-oic.generateBitmap = function(svg, imageType, handler) {
-	this.convertSVGtoImageData(svg, imageType, handler);
+oic.generateBitmap = function(svg, imageType, handler, errorHandler) {
+	this.convertSVGtoImageData(svg, imageType, handler, errorHandler);
 }
 
 oic.generateLink = function(input, handler) {

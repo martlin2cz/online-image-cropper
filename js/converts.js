@@ -7,7 +7,7 @@
 var DOMURL = window.URL || window.webkitURL || window;
 ///////////////////////////////////////////////////////////////////////////////
 
-oic.convertImageURLtoImageData = function(inputUrl, imageType, handler) {
+oic.convertImageURLtoImageData = function(inputUrl, imageType, handler, errorHandler) {
   var img = new Image();                                                                                                               
   img.crossOrigin="anonymous";
 
@@ -24,9 +24,10 @@ oic.convertImageURLtoImageData = function(inputUrl, imageType, handler) {
 		var imgDataURL = canvas.toDataURL('image/' + imageType);
 		handler(imgDataURL);
 	  };
-	  
+errorHandler("OK!"); //XXX just debug 
 	img.onerror = function(e) {
-		alert("Error: Cannot export image, nested image does not exist or is protected against copying. Try copy image data instead.");
+		console.error("Cannot export image");
+		errorHandler("Error: Cannot export image, nested image does not exist or is protected against copying. Try copy image data instead.", e);
 	}
 
   img.src = inputUrl;
@@ -51,19 +52,19 @@ oic.convertSVGtoSVGdata = function(svg, encoding) {
 	}
 } 
 
-oic.convertSVGtoImageData = function(svg, imageType, handler) {
+oic.convertSVGtoImageData = function(svg, imageType, handler, errorHandler) {
 	var oic = this;
 	var copy = svg.cloneNode(true);
 	this.imagesInSvgToData(copy, imageType, function(svg) {
 
 		var url = oic.convertSVGtoSVGdata(svg, null);
-		oic.convertImageURLtoImageData(url, imageType, handler);
-	});
+		oic.convertImageURLtoImageData(url, imageType, handler, errorHandler);
+	}, errorHandler);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////
 
-oic.imagesInSvgToData = function(svg, imageType, modifiedSvgHandler) {
+oic.imagesInSvgToData = function(svg, imageType, modifiedSvgHandler, errorHandler) {
 	var oic = this;
 	this.treeProcess(svg, function(e) {
 			return e.childNodes;
@@ -76,19 +77,21 @@ oic.imagesInSvgToData = function(svg, imageType, modifiedSvgHandler) {
 				oic.convertImageURLtoImageData(originalUrl, imageType, function(url) {
 					e.setAttributeNS('http://www.w3.org/1999/xlink', 'href', url);
 					itemCompletedHandler();
-				});
+				},
+				errorHandler);
 			}
 		},
 		function() {
 			modifiedSvgHandler(svg);
-		}
+		},
+		errorHandler
 	);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////
 
 
-oic.treeProcess = function(input, childGenerator, itemProcessor, resultProcessor) {
+oic.treeProcess = function(input, childGenerator, itemProcessor, resultProcessor, errorHandler) {
 	var children = childGenerator(input);
 	var remaining = 0;
 	
@@ -106,15 +109,15 @@ oic.treeProcess = function(input, childGenerator, itemProcessor, resultProcessor
 	for (var i = 0; i < children.length; i++) {
 		var child = children[i];
 		
-		itemProcessor(child, itemStartedHandler, itemCompletedHandler);
+		itemProcessor(child, itemStartedHandler, itemCompletedHandler, errorHandler);
 		
-		this.treeProcess(child, childGenerator, itemProcessor, resultProcessor);
+		this.treeProcess(child, childGenerator, itemProcessor, resultProcessor, errorHandler);
 	}
 }
 
 
 ////////////////////////////////////////////////////////////////////////////////////
-oic.convertPasteEventToURL = function(event, ifImageType, handler) {
+oic.convertPasteEventToURL = function(event, ifImageType, handler, errorHandler) {
 	var oic = this;
 	var type = oic.determinePasteType(event);
 	
@@ -126,11 +129,11 @@ oic.convertPasteEventToURL = function(event, ifImageType, handler) {
 				} else {
 					handler(url);
 				}
-			});
+			}, errorHandler);
 			break;
 
 		case 'file':
-			this.inferDataFromPaste(event, handler);
+			this.inferDataFromPaste(event, handler, errorHandler);
 			break;
 		default:
 			console.warn("Unknown paste type");
@@ -171,7 +174,7 @@ oic.inferTextFromPaste = function(event, handler) {
 }
 
 
-oic.inferDataFromPaste = function(event, handler) {
+oic.inferDataFromPaste = function(event, handler, errorHandler) {
 	var data = event.clipboardData  || event.originalEvent.clipboardData;
 	var items = data.items;
 	
@@ -186,7 +189,8 @@ oic.inferDataFromPaste = function(event, handler) {
 	};
 	
 	reader.onerror = function(e) {
-		alert(error);
+		console.error("Cannot read clipboard data");
+		errorHandler("Cannot read clipboard data. Never happended, dunno what to suggest to do.", e);
 	}
 
 	reader.readAsDataURL(blob);

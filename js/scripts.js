@@ -15,18 +15,18 @@ loadInputImageByUrl = function() {
 	var input = document.getElementById('input-url');
 	var url = input.value;
 
-	oic.loadInputImage(url);
+	oic.loadInputImage(url, handleError);
 }
 
 inputImagePasteHandler = function(event) {
 
 	var pasteHandler = function(url) {
 		var textHandler = function(url) {
-			oic.loadInputImage(url);
+			oic.loadInputImage(url, handleError);
 		}
 
 		if (url) {
-			oic.loadInputImage(url);			
+			oic.loadInputImage(url, handleError);			
 		} else {
 			oic.pasteEventToText(event, textHandler);
 		}
@@ -38,15 +38,19 @@ inputImagePasteHandler = function(event) {
 
 updateSvgByForm = function() {
 	oic.formToSvg();
-	oic.updateOutlink();
+	oic.updateOutlink(handleError);
 }
 
 toSquare = function(size) {
-	oic.cropToSquare(size);
+	oic.cropToSquare(size, handleError);
 }
 
 toCircle = function(size) {
-	oic.roundToCircle(size);
+	oic.roundToCircle(size, handleError);
+}
+
+handleError = function(e) {
+	alert("ERROR:" + e);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
